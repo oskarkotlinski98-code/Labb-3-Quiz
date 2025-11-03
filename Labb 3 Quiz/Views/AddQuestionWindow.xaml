@@ -1,0 +1,49 @@
+﻿<Window x:Class="Labb_3_Quiz.Views.AddQuestionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Question" Height="550" Width="700"
+        WindowStartupLocation="CenterOwner"
+        Background="Beige">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Question:" FontSize="18" FontWeight="Bold"/>
+        <TextBox x:Name="QuestionTextBox" Margin="0,25,0,10" FontSize="16"/>
+
+        <StackPanel Grid.Row="1" Margin="0,10">
+            <TextBlock Text="Answers:" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox x:Name="Answer1Box" Margin="0,2"/>
+            <TextBox x:Name="Answer2Box" Margin="0,2"/>
+            <TextBox x:Name="Answer3Box" Margin="0,2"/>
+            <TextBox x:Name="Answer4Box" Margin="0,2"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
+            <TextBlock Text="Correct answer (1–4):" FontSize="16" Margin="0,0,10,0"/>
+            <ComboBox x:Name="CorrectAnswerBox" Width="80" FontSize="16">
+                <ComboBoxItem Content="1"/>
+                <ComboBoxItem Content="2"/>
+                <ComboBoxItem Content="3"/>
+                <ComboBoxItem Content="4"/>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10">
+            <TextBlock Text="Image (optional):" FontSize="16" Margin="0,0,10,0"/>
+            <TextBox x:Name="ImagePathBox" Width="400" IsReadOnly="True" Margin="0,0,10,0"/>
+            <Button Content="Browse..." Click="BrowseImageClick"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Add" Width="100" Margin="5" Click="AddClick"/>
+            <Button Content="Cancel" Width="100" Margin="5" Click="CancelClick"/>
+        </StackPanel>
+    </Grid>
+</Window>
