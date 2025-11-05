@@ -9,8 +9,8 @@ namespace Labb_3_Quiz.QuizModel
 {
     public class QuizSession
     {
-        private readonly Quiz _quiz;
-        private readonly List<Question> _shuffledQuestions;
+        private Quiz _quiz;
+        private List<Question> _shuffledQuestions;
         private int _currentIndex = 0;
 
         public int CorrectAnswers { get; private set; }

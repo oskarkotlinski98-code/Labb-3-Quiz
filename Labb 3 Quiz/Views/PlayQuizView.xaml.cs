@@ -55,6 +55,8 @@ namespace Labb_3_Quiz.Views
                 AnswerThreeButton.Content = _currentQuestion.Answers[2];
                 AnswerFourButton.Content = _currentQuestion.Answers[3];
 
+
+
             if (!string.IsNullOrEmpty(_currentQuestion.ImagePath) && File.Exists(_currentQuestion.ImagePath))
             {
                 var image = new BitmapImage();
@@ -69,12 +71,14 @@ namespace Labb_3_Quiz.Views
             {
                 QuestionImage.Source = null;
             }
+            UpdateScore();
         }
 
             private void SubmitAnswer(int index)
             {
                 bool correct = _session.SubmitAnswer(_currentQuestion, index);
                 MessageBox.Show(correct ? "✅ Correct!" : "❌ Wrong!");
+                UpdateScore();
                 ShowNextQuestion();
             }
 
@@ -100,6 +104,10 @@ namespace Labb_3_Quiz.Views
         SubmitAnswer(3);
         } 
 
+        private void UpdateScore()
+        {
+            ScoreTextBlock.Text = $"{_session.CorrectAnswers}/{_session.TotalAnswered} {_session.GetScorePercentage():F1}%";
+        }
        
     } 
 }
