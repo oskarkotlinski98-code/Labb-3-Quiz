@@ -55,7 +55,7 @@ namespace Labb_3_Quiz.Views
                 MessageBox.Show("Failed to load");
             }
         }
-        private void DeleteSelectedQuizClick(object sender, RoutedEventArgs e)
+        private async void DeleteSelectedQuizClick(object sender, RoutedEventArgs e)
         {
             if (QuizList.SelectedItem is not string selectedTitle)
             {
@@ -63,20 +63,20 @@ namespace Labb_3_Quiz.Views
                 return;
             }
             var confirm = MessageBox.Show($"Are you sure you want to delete {selectedTitle} ?", "Confirm Delete", MessageBoxButton.YesNo);
-            if(confirm == MessageBoxResult.Yes)
+            if (confirm == MessageBoxResult.Yes)
             {
                 try
                 {
-                    SaveQuizToJson.DeleteQuiz(selectedTitle);
+                    await SaveQuizToJson.DeleteQuiz(selectedTitle);
                     MessageBox.Show($"Quiz '{selectedTitle}' deleted successfully!");
-                    QuizList.ItemsSource = (System.Collections.IEnumerable)SaveQuizToJson.GetAllSavedQuizzes();
+                    QuizList.ItemsSource = await SaveQuizToJson.GetAllSavedQuizzes();
 
                 }
-                catch
+                catch (Exception x)
                 {
                     MessageBox.Show("Failed to delete the quiz.");
                 }
-                
+
             }
         }
         private void BackClick(object sender, RoutedEventArgs e)
