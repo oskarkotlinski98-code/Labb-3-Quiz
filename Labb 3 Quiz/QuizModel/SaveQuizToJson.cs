@@ -15,7 +15,11 @@ namespace Labb_3_Quiz.QuizModel
         
         static SaveQuizToJson()
         {
-            Directory.CreateDirectory(Folder);
+            if (!Directory.Exists(Folder))
+            {
+                Directory.CreateDirectory(Folder);
+
+            }
         }
 
         public static void SaveQuizJson(Quiz quiz)
@@ -25,34 +29,42 @@ namespace Labb_3_Quiz.QuizModel
             File.WriteAllText(filePath, jsonString);
         }
 
-        public static Quiz LoadQuizFromFile(string title)
+        public static async Task<Quiz> LoadQuizFromFile(string title)
         {
             if (title == "Premade Quiz")
             {
                 return AddPremadeQuiz();
             }
             string filePath = Path.Combine(Folder, $"{title}.json");
-            string jsonString = File.ReadAllText(filePath);
+            string jsonString = await File.ReadAllTextAsync(filePath);
             return JsonSerializer.Deserialize<Quiz>(jsonString)!;
         }
 
-        public static IEnumerable<string> GetAllSavedQuizzes()
+        public static async Task<IEnumerable<string>> GetAllSavedQuizzes()
         {
             if (!Directory.Exists(Folder))
                 Directory.CreateDirectory(Folder);
 
-            var files = Directory.GetFiles(Folder, "*.json");
-            var names = new List<string>();
-
-            foreach (var file in files)
-                names.Add(Path.GetFileNameWithoutExtension(file));
-
             
-            if (!names.Contains("Premade Quiz"))
-                names.Add("Premade Quiz");
+            return await Task.Run(() =>
+            {
+                var files = Directory.GetFiles(Folder, "*.json");
+                var names = new List<string>();
 
-            return names;
+                foreach (var file in files)
+                    names.Add(Path.GetFileNameWithoutExtension(file));
+
+                // Add your premade quiz if missing
+                if (!names.Contains("Premade Quiz"))
+                    names.Add("Premade Quiz");
+
+                return names.AsEnumerable();
+            });
         }
+
+
+
+
 
         public static void DeleteQuiz(string title)
         {

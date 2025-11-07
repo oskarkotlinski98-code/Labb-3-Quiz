@@ -39,9 +39,14 @@ namespace Labb_3_Quiz
 
         private void PlayQuizClick(object sender, RoutedEventArgs e)
         {
-            
+            try { 
             _mainWindow.ShowView(new SelectQuizView(_mainWindow));
         }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Error loading quiz view:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+}
 
         private void EditQuizClick(object sender, RoutedEventArgs e)
         {

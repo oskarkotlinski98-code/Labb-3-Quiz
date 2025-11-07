@@ -32,8 +32,12 @@ namespace Labb_3_Quiz.Views
                 InitializeComponent();
                 _mainWindow = mainWindow;
             }
+             public PlayQuizView(MainWindow mainWindow, Quiz quiz) : this(mainWindow)
+             {
+             LoadQuiz(quiz);
+             }
 
-            public void LoadQuiz(Quiz quiz)
+        public void LoadQuiz(Quiz quiz)
             {
                 _session = new QuizSession(quiz);
                 ShowNextQuestion();

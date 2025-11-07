@@ -29,10 +29,16 @@ namespace Labb_3_Quiz.Views
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-            QuizList.ItemsSource = SaveQuizToJson.GetAllSavedQuizzes();
+            _ = LoadQuizListAsync();
         }
 
-        private void EditSelectedQuizClick(object sender, RoutedEventArgs e)
+
+        private async Task LoadQuizListAsync()
+        {
+            QuizList.ItemsSource = await SaveQuizToJson.GetAllSavedQuizzes();
+        }
+
+        private async void EditSelectedQuizClick(object sender, RoutedEventArgs e)
         {
             if(QuizList.SelectedItem is not string selectedTitle)
             {
@@ -41,7 +47,7 @@ namespace Labb_3_Quiz.Views
             }
             try
             {
-                var quiz = SaveQuizToJson.LoadQuizFromFile(selectedTitle);
+                var quiz = await SaveQuizToJson.LoadQuizFromFile(selectedTitle);
                 _mainWindow.ShowView(new CreateQuizView(_mainWindow, quiz));
             }
             catch
@@ -63,7 +69,7 @@ namespace Labb_3_Quiz.Views
                 {
                     SaveQuizToJson.DeleteQuiz(selectedTitle);
                     MessageBox.Show($"Quiz '{selectedTitle}' deleted successfully!");
-                    QuizList.ItemsSource =SaveQuizToJson.GetAllSavedQuizzes();
+                    QuizList.ItemsSource = (System.Collections.IEnumerable)SaveQuizToJson.GetAllSavedQuizzes();
 
                 }
                 catch

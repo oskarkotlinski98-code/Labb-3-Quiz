@@ -28,11 +28,26 @@ namespace Labb_3_Quiz.Views
             InitializeComponent();
             _mainWindow = mainWindow;
 
-            // Load all quizzes from storage
-            QuizList.ItemsSource = SaveQuizToJson.GetAllSavedQuizzes();
+            LoadQuizListAsync();
         }
 
-        private void PlaySelectedClick(object sender, RoutedEventArgs e)
+
+        private async Task LoadQuizListAsync()
+        {
+            try
+            {
+                var quizzes = await SaveQuizToJson.GetAllSavedQuizzes();
+                QuizList.ItemsSource = quizzes;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load quiz list:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+
+        private async void PlaySelectedClick(object sender, RoutedEventArgs e)
         {
             if (QuizList.SelectedItem is not string selectedTitle)
             {
@@ -42,12 +57,12 @@ namespace Labb_3_Quiz.Views
 
             try
             {
-                var quiz = SaveQuizToJson.LoadQuizFromFile(selectedTitle);
+                var quiz = await SaveQuizToJson.LoadQuizFromFile(selectedTitle);
                 
                 
                 var playView = new PlayQuizView(_mainWindow);
                 playView.LoadQuiz(quiz);
-                _mainWindow.ShowView(playView);
+                _mainWindow.ShowView(new PlayQuizView(_mainWindow, quiz));
             }
             catch
             {
