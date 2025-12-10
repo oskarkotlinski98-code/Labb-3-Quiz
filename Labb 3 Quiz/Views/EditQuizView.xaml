@@ -11,7 +11,7 @@
 
         <TextBlock Text="Edit an existing quiz"  FontSize="40" FontWeight="Bold" HorizontalAlignment="Center"  Margin="0,10,0,30"/>
 
-        <ListBox x:Name="QuizList" Grid.Row="1" FontSize="24" BorderThickness="2" BorderBrush="Black" Background="Ivory" SelectionMode="Single"/>
+        <ListBox x:Name="QuizList" DisplayMemberPath="Title" Grid.Row="1" FontSize="24" BorderThickness="2" BorderBrush="Black" Background="Ivory" SelectionMode="Single"/>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0">
             <Button Content="Edit selected quiz"  FontSize="24" Margin="10" Padding="20,10" Click="EditSelectedQuizClick"/>

@@ -17,62 +17,85 @@ using System.Windows.Shapes;
 
 namespace Labb_3_Quiz.Views
 {
-    /// <summary>
-    /// Interaction logic for AddQuestionWindow.xaml
-    /// </summary>
     public partial class AddQuestionWindow : Window
     {
-        public Question NewQuestion { get; private set; }
+        public Question? CreatedQuestion { get; private set; }
+
         public AddQuestionWindow()
         {
             InitializeComponent();
+            CorrectAnswerBox.SelectedIndex = 0; // Default = 1
         }
 
-        public void BrowseImageClick(object sender, RoutedEventArgs e)
+        private void BrowseImageClick(object sender, RoutedEventArgs e)
         {
-            var chosenImage = new OpenFileDialog
-            {
-                Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg"
-            };
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp;*.gif";
 
-            if (chosenImage.ShowDialog() == true)
+            if (dlg.ShowDialog() == true)
             {
-                ImagePathBox.Text = chosenImage.FileName;
+                ImagePathBox.Text = dlg.FileName;
             }
-
         }
 
         private void AddClick(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(QuestionTextBox.Text) ||
-               string.IsNullOrWhiteSpace(Answer1Box.Text) ||
-               string.IsNullOrWhiteSpace(Answer2Box.Text) ||
-               string.IsNullOrWhiteSpace(Answer3Box.Text) ||
-               string.IsNullOrWhiteSpace(Answer4Box.Text))
+            string questionText = QuestionTextBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(questionText))
             {
-                MessageBox.Show("Please fill in all spaces");
+                MessageBox.Show("You must enter a question.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            int correctAnswer = CorrectAnswerBox.SelectedIndex;
-
-            NewQuestion = new Question(QuestionTextBox.Text,
-                new[] { Answer1Box.Text, Answer2Box.Text, Answer3Box.Text, Answer4Box.Text }, correctAnswer);
-            if (!string.IsNullOrWhiteSpace(ImagePathBox.Text) && File.Exists(ImagePathBox.Text))
+            string[] answers =
             {
-                NewQuestion.ImagePath = ImagePathBox.Text;
+                Answer1Box.Text.Trim(),
+                Answer2Box.Text.Trim(),
+                Answer3Box.Text.Trim(),
+                Answer4Box.Text.Trim()
+            };
+
+            
+            for (int i = 0; i < answers.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(answers[i]))
+                {
+                    MessageBox.Show($"Answer {i + 1} cannot be empty.",
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
+
+            if (CorrectAnswerBox.SelectedIndex < 0)
+            {
+                MessageBox.Show("Select which answer is correct.",
+                    "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            int correctIndex = CorrectAnswerBox.SelectedIndex;
+
+             
+            CreatedQuestion = new Question
+            {
+                Statement = questionText,
+                Answers = answers,
+                CorrectAnswer = correctIndex,
+                ImagePath = string.IsNullOrWhiteSpace(ImagePathBox.Text)
+                    ? null
+                    : ImagePathBox.Text
+            };
 
             DialogResult = true;
             Close();
-
         }
+
         private void CancelClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             Close();
         }
-
-
     }
 }

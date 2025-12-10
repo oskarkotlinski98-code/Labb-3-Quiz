@@ -1,83 +1,70 @@
-﻿using System;
+﻿using Labb_3_Quiz.QuizModel;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Labb_3_Quiz.QuizModel
+namespace Labb_3_Quiz.Data
 {
-    public static class SaveQuizToJson
+    public class MongoQuizStorage
     {
-        private static readonly string Folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Labb3-NET22");
+        private readonly IMongoCollection<Quiz> _quizCollection;
+
+        public MongoQuizStorage()
+        {
+            var db = new MongoDbContext();
+            _quizCollection = db.Quizzes;
+        }
 
         
-        static SaveQuizToJson()
+        public async Task<List<Quiz>> GetAllQuizzesAsync()
         {
-            if (!Directory.Exists(Folder))
+            return await _quizCollection.Find(_ => true).ToListAsync();
+        }
+
+       
+        public async Task<Quiz?> GetQuizByIdAsync(string id)
+        {
+            return await _quizCollection
+                .Find(q => q.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
+      
+        public async Task<Quiz?> GetQuizByTitleAsync(string title)
+        {
+            return await _quizCollection
+                .Find(q => q.Title == title)
+                .FirstOrDefaultAsync();
+        }
+
+      
+        public async Task CreateQuizAsync(Quiz quiz)
+        {
+            await _quizCollection.InsertOneAsync(quiz);
+        }
+
+        
+        public async Task UpdateQuizAsync(Quiz quiz)
+        {
+            await _quizCollection
+                .ReplaceOneAsync(q => q.Id == quiz.Id, quiz);
+        }
+
+        public async Task DeleteQuizAsync(string id)
+        {
+            await _quizCollection.DeleteOneAsync(q => q.Id == id);
+        }
+    
+
+
+        private Quiz CreatePremadeQuiz()
             {
-                Directory.CreateDirectory(Folder);
 
-            }
-        }
-
-        public static void SaveQuizJson(Quiz quiz)
-        {
-            string filePath = Path.Combine(Folder, $"{quiz.Title}.json");
-            string jsonString = JsonSerializer.Serialize(quiz);
-            File.WriteAllText(filePath, jsonString);
-        }
-
-        public static async Task<Quiz> LoadQuizFromFile(string title)
-        {
-            if (title == "Premade Quiz")
-            {
-                return AddPremadeQuiz();
-            }
-            string filePath = Path.Combine(Folder, $"{title}.json");
-            string jsonString = await File.ReadAllTextAsync(filePath);
-            return JsonSerializer.Deserialize<Quiz>(jsonString)!;
-        }
-
-        public static async Task<IEnumerable<string>> GetAllSavedQuizzes()
-        {
-            if (!Directory.Exists(Folder))
-                Directory.CreateDirectory(Folder);
-
-            
-            return await Task.Run(() =>
-            {
-                var files = Directory.GetFiles(Folder, "*.json");
-                var names = new List<string>();
-
-                foreach (var file in files)
-                    names.Add(Path.GetFileNameWithoutExtension(file));
-
-               
-                if (!names.Contains("Premade Quiz"))
-                    names.Add("Premade Quiz");
-
-                return names.AsEnumerable();
-            });
-        }
-
-
-
-
-
-        public static async Task DeleteQuiz(string title)
-        {
-            string path = Path.Combine(Folder, $"{title}.json");
-            if (File.Exists(path))
-            {
-                await Task.Run(() => File.Delete(path));
-
-            }
-        }
-
-        private static Quiz AddPremadeQuiz()
-        {
             var quiz = new Quiz("Premade Quiz");
 
             List<Question> questions = new List<Question>() {
@@ -118,8 +105,5 @@ namespace Labb_3_Quiz.QuizModel
             }
             return quiz;
         }
-
-
     }
 }
-

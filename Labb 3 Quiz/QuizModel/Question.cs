@@ -9,18 +9,19 @@ namespace Labb_3_Quiz.QuizModel
     public class Question
     {
 
-        public string Statement { get; }
-        public string[] Answers { get; }
-        public int CorrectAnswer { get; }
-        public string ImagePath { get; set; }
+        public string Statement { get; set; } = string.Empty;
+        public string[] Answers { get; set; } = new string[4];
+        public int CorrectAnswer { get; set; }
+        public string? ImagePath { get; set; }
 
-        
-        public Question(string statement, string[] answers, int correctAnswer)
+        public Question() {}
+
+        public Question(string statement, string[] answers, int correctAnswer, string? imagePath = null)
         {
             Statement = statement;
             Answers = answers;
             CorrectAnswer = correctAnswer;
-
+            ImagePath = imagePath;
         }
     }
 }

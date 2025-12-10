@@ -14,6 +14,7 @@
 
         <ListBox x:Name="QuizList"
                  Grid.Row="1"
+                 DisplayMemberPath="Title"
                  FontSize="24"
                  BorderThickness="2"
                  BorderBrush="SaddleBrown"

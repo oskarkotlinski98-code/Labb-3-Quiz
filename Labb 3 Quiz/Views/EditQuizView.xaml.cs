@@ -1,4 +1,5 @@
-﻿using Labb_3_Quiz.QuizModel;
+﻿using Labb_3_Quiz.Data;
+using Labb_3_Quiz.QuizModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,9 +19,7 @@ using Path = System.IO.Path;
 
 namespace Labb_3_Quiz.Views
 {
-    /// <summary>
-    /// Interaction logic for EditQuizView.xaml
-    /// </summary>
+   
     public partial class EditQuizView : UserControl
     {
         private MainWindow _mainWindow;
@@ -35,19 +34,23 @@ namespace Labb_3_Quiz.Views
 
         private async Task LoadQuizListAsync()
         {
-            QuizList.ItemsSource = await SaveQuizToJson.GetAllSavedQuizzes();
+            MongoQuizStorage storage = new MongoQuizStorage();
+            var quizzes = await storage.GetAllQuizzesAsync();
+            
+            QuizList.ItemsSource = quizzes;
         }
 
         private async void EditSelectedQuizClick(object sender, RoutedEventArgs e)
         {
-            if(QuizList.SelectedItem is not string selectedTitle)
+            if(QuizList.SelectedItem is not Quiz selectedQuiz)
             {
                 MessageBox.Show("Please select a quiz to edit!");
                 return;
             }
             try
             {
-                var quiz = await SaveQuizToJson.LoadQuizFromFile(selectedTitle);
+                MongoQuizStorage storage = new MongoQuizStorage();
+                var quiz = await storage.GetQuizByTitleAsync(selectedQuiz.Title);
                 _mainWindow.ShowView(new CreateQuizView(_mainWindow, quiz));
             }
             catch
@@ -57,19 +60,20 @@ namespace Labb_3_Quiz.Views
         }
         private async void DeleteSelectedQuizClick(object sender, RoutedEventArgs e)
         {
-            if (QuizList.SelectedItem is not string selectedTitle)
+            if (QuizList.SelectedItem is not Quiz selectedQuiz)
             {
                 MessageBox.Show("Please select a quiz to delete!");
                 return;
             }
-            var confirm = MessageBox.Show($"Are you sure you want to delete {selectedTitle} ?", "Confirm Delete", MessageBoxButton.YesNo);
+            var confirm = MessageBox.Show($"Are you sure you want to delete {selectedQuiz.Title} ?", "Confirm Delete", MessageBoxButton.YesNo);
             if (confirm == MessageBoxResult.Yes)
             {
                 try
                 {
-                    await SaveQuizToJson.DeleteQuiz(selectedTitle);
-                    MessageBox.Show($"Quiz '{selectedTitle}' deleted successfully!");
-                    QuizList.ItemsSource = await SaveQuizToJson.GetAllSavedQuizzes();
+                    MongoQuizStorage storage = new MongoQuizStorage();
+                    await storage.DeleteQuizAsync(selectedQuiz.Title);
+                    MessageBox.Show($"Quiz '{selectedQuiz.Title}' deleted successfully!");
+                    QuizList.ItemsSource = await storage.GetAllQuizzesAsync();
 
                 }
                 catch (Exception x)

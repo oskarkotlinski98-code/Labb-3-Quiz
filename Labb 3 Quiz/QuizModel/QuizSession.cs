@@ -1,54 +1,36 @@
 ﻿using Labb_3_Quiz.QuizModel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Labb_3_Quiz.QuizModel
+namespace Labb_3_Quiz
 {
     public class QuizSession
     {
-        private Quiz _quiz;
-        private List<Question> _shuffledQuestions;
-        private int _currentIndex = 0;
+        private readonly Quiz _quiz;
+        private int _currentQuestionIndex = 0;
 
-        public int CorrectAnswers { get; private set; }
-        public int TotalAnswered { get; private set; }
+        public int Score { get; private set; }
+        public Question CurrentQuestion => _quiz.Questions[_currentQuestionIndex];
+        public int TotalQuestions => _quiz.Questions.Count;
+        public int CurrentIndex => _currentQuestionIndex + 1;
 
         public QuizSession(Quiz quiz)
         {
-            _quiz = quiz ?? throw new ArgumentNullException(nameof(quiz));
-            _shuffledQuestions = _quiz.Questions.OrderBy(q => Guid.NewGuid()).ToList();
+            _quiz = quiz;
+            Score = 0;
         }
 
-        public Question GetNextQuestion()
+        public bool HasMoreQuestions()
         {
-            if (_currentIndex >= _shuffledQuestions.Count)
-            {
-                return null;
-
-            }
-            return _shuffledQuestions[_currentIndex++];
+            return _currentQuestionIndex < _quiz.Questions.Count;
         }
 
-        public bool SubmitAnswer(Question q, int selectedIndex)
+        public void SubmitAnswer(int selectedIndex)
         {
-            TotalAnswered++;
-            if (q.CorrectAnswer == selectedIndex)
-            {
-                CorrectAnswers++;
-                return true;
-            }
-            return false;
-        }
+            if (selectedIndex == CurrentQuestion.CorrectAnswer)
+                Score++;
 
-        public double GetScorePercentage()
-        {
-            if (TotalAnswered == 0) return 0;
-            return (double)CorrectAnswers / TotalAnswered * 100;
+            _currentQuestionIndex++;
         }
-
-        public bool IsFinished => _currentIndex >= _shuffledQuestions.Count;
     }
 }

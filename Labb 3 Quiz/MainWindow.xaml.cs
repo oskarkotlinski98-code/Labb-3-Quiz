@@ -18,7 +18,7 @@ namespace Labb_3_Quiz
         {
             InitializeComponent();
 
-            // Load main menu at startup
+            
             ShowView(new MainMenuView(this));
         }
 

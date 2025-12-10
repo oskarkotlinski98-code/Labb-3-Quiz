@@ -1,4 +1,5 @@
-﻿using Labb_3_Quiz.QuizModel;
+﻿using Labb_3_Quiz.Data;
+using Labb_3_Quiz.QuizModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,9 @@ namespace Labb_3_Quiz.Views
         {
             try
             {
-                var quizzes = await SaveQuizToJson.GetAllSavedQuizzes();
+                MongoQuizStorage storage = new MongoQuizStorage();
+                
+                var quizzes = await storage.GetAllQuizzesAsync();
                 QuizList.ItemsSource = quizzes;
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace Labb_3_Quiz.Views
 
         private async void PlaySelectedClick(object sender, RoutedEventArgs e)
         {
-            if (QuizList.SelectedItem is not string selectedTitle)
+            if (QuizList.SelectedItem is not Quiz selectedQuiz)
             {
                 MessageBox.Show("Please select a quiz first!");
                 return;
@@ -57,7 +60,9 @@ namespace Labb_3_Quiz.Views
 
             try
             {
-                var quiz = await SaveQuizToJson.LoadQuizFromFile(selectedTitle);
+                MongoQuizStorage storage = new MongoQuizStorage();
+
+                var quiz = await storage.GetQuizByTitleAsync(selectedQuiz.Title);
                 
                 
                 var playView = new PlayQuizView(_mainWindow);

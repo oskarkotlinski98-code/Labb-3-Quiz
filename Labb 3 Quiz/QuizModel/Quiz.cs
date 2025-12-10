@@ -1,4 +1,6 @@
 ﻿using Labb_3_Quiz.QuizModel;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,47 +11,51 @@ namespace Labb_3_Quiz.QuizModel
 {
     public class Quiz
     {
-
-        private IEnumerable<Question> _questions;
-        private string _title = string.Empty;
-        private static Random _random = new Random();
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string Title {get;set;}
+        public List<Question> Questions { get;set; } = new List<Question>();
+        public Quiz() { }
 
         
-        public IEnumerable<Question> Questions
-        {
-            get => _questions;
-            set => _questions = value;
-        }
-        public string Title => _title;
-
         public Quiz(string title)
         {
-            _title = title;
-            _questions = new List<Question>();
+            Title = title;
+            Questions = new List<Question>();
         }
 
-        public Question GetRandomQuestion()
-        {
-            var list = _questions.ToList();
-            if (list.Count == 0) return null!;
-            int randomIndex = _random.Next(list.Count);
-            return list[randomIndex];
-        }
 
         public void AddQuestion(Question q)
         {
-            var list = _questions.ToList();
-            
-            list.Add(q);
-            _questions = list;
+            Questions.Add(q);
         }
 
+       
         public void RemoveQuestion(int index)
         {
-            var list = _questions.ToList();
-            if (index >= 0 && index < list.Count)
-                list.RemoveAt(index);
-            _questions = list;
+            if (index >= 0 && index < Questions.Count)
+                Questions.RemoveAt(index);
         }
+
+        
+        public void UpdateQuestion(int index, Question updated)
+        {
+            if (index >= 0 && index < Questions.Count)
+                Questions[index] = updated;
+        }
+
+
+
+        private static readonly Random _rng = new Random();
+        public Question? GetRandomQuestion()
+        {
+            if (Questions.Count == 0) return null;
+            return Questions[_rng.Next(Questions.Count)];
+        }
+
+      
+
+        
     }
 }

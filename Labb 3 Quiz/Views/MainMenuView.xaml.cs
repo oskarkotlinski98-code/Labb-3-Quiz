@@ -17,9 +17,7 @@ using System.Windows.Shapes;
 
 namespace Labb_3_Quiz
 {
-    /// <summary>
-    /// Interaction logic for MainMenuView.xaml
-    /// </summary>
+   
     public partial class MainMenuView : UserControl
     {
         private readonly MainWindow _mainWindow;

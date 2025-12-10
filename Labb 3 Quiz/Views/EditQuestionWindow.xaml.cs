@@ -17,50 +17,96 @@ using System.Windows.Shapes;
 
 namespace Labb_3_Quiz.Views
 {
-    
+
     public partial class EditQuestionWindow : Window
     {
-        public Question? EditedQuestion { get; private set; }
+        public Question EditedQuestion { get; private set; }
+        private readonly Question _original;
 
-        public EditQuestionWindow(Question question)
+        public EditQuestionWindow(Question questionToEdit)
         {
             InitializeComponent();
-            LoadQuestion(question);
+
+            _original = questionToEdit;
+
+            LoadQuestionIntoFields(questionToEdit);
         }
 
-        private void LoadQuestion(Question q)
+        private void LoadQuestionIntoFields(Question q)
         {
+           
             QuestionTextBox.Text = q.Statement;
             Answer1Box.Text = q.Answers[0];
             Answer2Box.Text = q.Answers[1];
             Answer3Box.Text = q.Answers[2];
             Answer4Box.Text = q.Answers[3];
 
+            
             CorrectAnswerBox.SelectedIndex = q.CorrectAnswer;
-            ImagePathBox.Text = q.ImagePath;
+
+            
+            ImagePathBox.Text = q.ImagePath ?? "";
         }
 
         private void BrowseImage_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
-            {
-                Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg"
-            };
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp;*.gif";
 
-            if (openFileDialog.ShowDialog() == true)
-                ImagePathBox.Text = openFileDialog.FileName;
+            if (dlg.ShowDialog() == true)
+            {
+                ImagePathBox.Text = dlg.FileName;
+            }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            EditedQuestion = new Question(
-                QuestionTextBox.Text,
-                new[] { Answer1Box.Text, Answer2Box.Text, Answer3Box.Text },
-                CorrectAnswerBox.SelectedIndex
-            );
+            string questionText = QuestionTextBox.Text.Trim();
 
-            if (!string.IsNullOrWhiteSpace(ImagePathBox.Text) && File.Exists(ImagePathBox.Text))
-                EditedQuestion.ImagePath = ImagePathBox.Text;
+            if (string.IsNullOrWhiteSpace(questionText))
+            {
+                MessageBox.Show("You must enter a question.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string[] answers =
+            {
+                Answer1Box.Text.Trim(),
+                Answer2Box.Text.Trim(),
+                Answer3Box.Text.Trim(),
+                Answer4Box.Text.Trim()
+            };
+
+            for (int i = 0; i < answers.Length; i++)
+            {
+                if (string.IsNullOrWhiteSpace(answers[i]))
+                {
+                    MessageBox.Show($"Answer {i + 1} cannot be empty.",
+                        "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            if (CorrectAnswerBox.SelectedIndex < 0)
+            {
+                MessageBox.Show("Select which answer is correct.",
+                    "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            int correctIndex = CorrectAnswerBox.SelectedIndex;
+
+            
+            EditedQuestion = new Question
+            {
+                Statement = questionText,
+                Answers = answers,
+                CorrectAnswer = correctIndex,
+                ImagePath = string.IsNullOrWhiteSpace(ImagePathBox.Text)
+                               ? null
+                               : ImagePathBox.Text
+            };
 
             DialogResult = true;
             Close();
